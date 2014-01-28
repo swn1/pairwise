@@ -1,4 +1,6 @@
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
 <head>
 <script src="js/codemirror.js" type="text/javascript"></script>
 <title>PairWise Test Case Tool - powered by PICT and CodeMirror</title>
@@ -34,10 +36,10 @@
             <input type="button" value="CleanEditor" onclick="cleanInput()" title="Clean editor"/>
         </td>        
         <td>
-            <input type="text" id="programPath" size="30" title="Path to PICT.exe" value="C:\Program\PICT\PICT.exe" onchange="reloadHelpPath()"  />
+            <input type="text" id="programPath" size="30" title="Path to PICT.exe" value="c:\Progra~2\PICT\PICT.exe" onchange="reloadHelpPath()"  />
         </td>              
         <td>
-            <input type="text" id="modelFile" size="30" title="Test Case Model file" value="D:\MyTestCaseModel.txt"/>
+            <input type="text" id="modelFile" size="30" title="Test Case Model file" value="C:\code\MyTestCaseModel.txt"/>
         </td>              
         <td>
             <font face="verdana" size="1"><b>&nbsp;Options&nbsp;</b></font>
@@ -61,7 +63,7 @@ title="/o:N    - Order of combinations (default: 2)
         </td>
 
         <td id="pictHelp">
-            &nbsp;<a href="C:\Program\PICT\PICTHelp.htm" target="_blank"><font face="verdana" size="1">PICT&nbsp;user&nbsp;guide</font></a>&nbsp;
+            &nbsp;<a href="C:\Progra~2\PICT\PICTHelp.htm" target="_blank"><font face="verdana" size="1">PICT&nbsp;user&nbsp;guide</font></a>&nbsp;
         </td>
     </tr>
 </table>
@@ -92,7 +94,7 @@ THEN [AnotherParameter] <> "False";
             <input type="button" value="GenerateTestCases" onclick="generateTestCases()" title="Generate Test Cases"/>
         </td>
         <td>
-            <input type="text" id="testCaseOutPut" size="30" title="Test Case Output file" value="D:\MyTestCases.txt"/>
+            <input type="text" id="testCaseOutPut" size="30" title="Test Case Output file" value="C:\code\MyTestCases.txt"/>
         </td>                      
         <td>
             <input type="button" value="ExportToExcel" onclick="XLExport()" title="Export to Microsoft Excel"/>
@@ -105,7 +107,7 @@ THEN [AnotherParameter] <> "False";
         </td>       
     </tr>
 </table>
-<div id="testCaseGrid" />
+<div id="testCaseGrid"></div>
 <script type="text/javascript">
 //Global var
 try {
