@@ -1,0 +1,232 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script src="js/codemirror.js" type="text/javascript"></script>
+<title>PairWise Test Case Tool - powered by PICT and CodeMirror</title>
+<link rel="stylesheet" type="text/css" href="css/docs.css"/>
+<style type="text/css">
+  .CodeMirror-line-numbers {
+    width: 2.2em;
+    color: #aaa;
+    background-color: #eee;
+    text-align: right;
+    padding-right: .3em;
+    font-size: 7pt;
+    font-family: verdana;
+    padding-top: .4em;
+  }      
+  select {font-family: verdana; font-size: 7pt; font-weight: 500;}
+  input {font-family: verdana; font-size: 7pt; font-weight: 500;}
+  textarea {font-family: verdana; font-size: 7pt; font-weight: 500;}
+</style>
+</head>
+
+<body style="padding: 9px;" bgcolor="#DE7008">
+
+<center><font face="verdana" size="3">PairWise Test Case Tool - powered by PICT and CodeMirror</font></center>
+
+<div id="inputOptions">
+<table width="250" border="0" cellspacing="2" cellpadding="0" bgcolor="#DE7008">
+    <tr>
+        <td width="50">
+            <font face="verdana" size="1"><b>Test&nbsp;Case&nbsp;Model&nbsp;</b></font>
+        </td>
+        <td>
+            <input type="button" value="CleanEditor" onclick="cleanInput()" title="Clean editor"/>
+        </td>        
+        <td>
+            <input type="text" id="programPath" size="30" title="Path to PICT.exe" value="C:\Program\PICT\PICT.exe" onchange="reloadHelpPath()"  />
+        </td>              
+        <td>
+            <input type="text" id="modelFile" size="30" title="Test Case Model file" value="D:\MyTestCaseModel.txt"/>
+        </td>              
+        <td>
+            <font face="verdana" size="1"><b>&nbsp;Options&nbsp;</b></font>
+        </td>
+        <td>    
+            <input type="text" id="pictOptions" size="30"             
+title="/o:N    - Order of combinations (default: 2)
+/d:C    - Separator for values  (default: ,)
+/a:C    - Separator for aliases (default: |)
+/n:C    - Negative value prefix (default: ~)
+/e:file - File with seeding rows
+/r[:N]  - Randomize generation, N - seed
+/c      - Case-sensitive model evaluation
+/s " value="/c"/>
+        </td>
+        <td>
+            &nbsp;<a href="LICENSE.txt" target="_blank"><font face="verdana" size="1">License</font></a>&nbsp;
+        </td>
+        <td>
+            &nbsp;<a href="RELEASE_NOTES.txt" target="_blank"><font face="verdana" size="1">Release&nbsp;Notes</font></a>&nbsp;
+        </td>
+
+        <td id="pictHelp">
+            &nbsp;<a href="C:\Program\PICT\PICTHelp.htm" target="_blank"><font face="verdana" size="1">PICT&nbsp;user&nbsp;guide</font></a>&nbsp;
+        </td>
+    </tr>
+</table>
+</div>
+<div id="req" style="border: 1px solid black; padding: 0px;">
+<textarea id="input" cols="120" rows="35">
+# ********************************************************************************************
+# * GUI shell for PICT - deluxe version                                                      * 
+# * by Stefan Thelenius (http://abouttesting.blogspot.com/)                                  *
+# * Credits to Jacek Czerwonka (Microsoft) for PICT.exe and Marijn Haverbeke for CodeMirror  *
+# ********************************************************************************************
+
+# 1. Define parameters and values
+MyParameter:    Yes, No, N/A
+AnotherParameter: True, False
+# 2. Add constraints
+IF [MyParameter] = "Yes"
+THEN [AnotherParameter] <> "False";
+# 3. Press button GenerateTestCases
+</textarea>
+</div>
+<table width="250" border="0" cellspacing="2" cellpadding="0" bgcolor="#DE7008">
+    <tr>
+        <td>
+            <font face="verdana" size="1"><b>Test&nbsp;Cases&nbsp;</b></font>
+        </td>
+        <td>
+            <input type="button" value="GenerateTestCases" onclick="generateTestCases()" title="Generate Test Cases"/>
+        </td>
+        <td>
+            <input type="text" id="testCaseOutPut" size="30" title="Test Case Output file" value="D:\MyTestCases.txt"/>
+        </td>                      
+        <td>
+            <input type="button" value="ExportToExcel" onclick="XLExport()" title="Export to Microsoft Excel"/>
+        </td>         
+          <td>
+            <font face="verdana" size="1"><b>&nbsp;Timeout&nbsp;</b></font>
+        </td>
+        <td>    
+            <input type="text" id="timeout" size="2" title="Timeout in seconds" value="5"/>
+        </td>       
+    </tr>
+</table>
+<div id="testCaseGrid" />
+<script type="text/javascript">
+//Global var
+try {
+    var editor = CodeMirror.fromTextArea('input', {
+        height: "300px",
+        parserfile: "pict.js",
+        stylesheet: "css/pictcolors.css",
+        path: "js/",
+        continuousScanning: 500,
+        lineNumbers: false
+    });
+    editor.focus();
+}
+catch (err) {
+    //var reload = setTimeout("window.location.reload();", 200);
+}
+
+reloadHelpPath();
+
+function reloadHelpPath() {
+    document.getElementById("pictHelp").innerHTML = getPICTHelpFilePath();
+}
+
+function getPICTHelpFilePath() {
+    var programPath = document.getElementById("programPath").value;
+    var pictPath = programPath.replace('PICT.exe', 'PICTHelp.htm');    
+    return '&nbsp;<a href="' + pictPath + '" target="_blank"><font face="verdana" size="1">PICT&nbsp;user&nbsp;guide</font></a>&nbsp;';
+}
+
+
+function cleanInput() {
+    editor.setCode('');
+}
+
+function readTestCaseOutFile() {
+    var fso = new ActiveXObject("Scripting.FileSystemObject");
+    var ForReading = 1
+    var testCaseOutPut = document.getElementById("testCaseOutPut").value;
+    var fh = fso.OpenTextFile(testCaseOutPut, ForReading, false);
+    var count = 0;
+    var str = '';
+    var strhtml = '<table border="1" cellspacing="2" cellpadding="2" bgcolor="White" id="iList">';
+    var parameters = new Array();
+    while (!fh.AtEndOfStream) {
+        str = fh.ReadLine();
+        strhtml += '<tr>';
+        if (count == 0) {
+            parameters = str.split('\t');            
+            strhtml += '<td><b><font face="verdana" size="1">#</font></b></td>';
+            for (i = 0; i <= parameters.length - 1; i++) {
+                strhtml += '<td><b><font face="verdana" size="1">' + parameters[i] + '</font></b></td>';
+            }
+            strhtml += '<td><b><font face="verdana" size="1">Notes</font></b></td>';
+        }
+        else {
+            parameters = str.split('\t');
+            strhtml += '<td align="center"><font face="verdana" size="1">' + count + '</font></td>';
+            for (i = 0; i <= parameters.length - 1; i++) {
+                strhtml += '<td><font face="verdana" size="1">' + parameters[i] + '</font></td>';
+            }
+            strhtml += '<td><font face="verdana" size="1">&nbsp;</font></td>';
+            strhtml += '</tr>';
+        }
+        count++;
+    }
+    strhtml += '</font></table>';
+    fh.Close();
+    if (parameters.length == 0) {
+        document.getElementById("testCaseGrid").innerHTML = '<font face="verdana" size="1" style="BACKGROUND-COLOR: red">Error creating test case file, please check input syntax or options...</font>'; ;
+    }
+    else {
+        document.getElementById("testCaseGrid").innerHTML = strhtml;
+    }
+}
+
+function generateTestCases() {
+    var inputCode = editor.getCode();
+    var modelFile = document.getElementById("modelFile").value;
+    // Create PICT temporary input file
+    writeFile(modelFile, inputCode);
+    var programPath = document.getElementById("programPath").value;
+    var testCaseOutPut = document.getElementById("testCaseOutPut").value;
+    var pictOptions = ''; // Assign data type to string
+    pictOptions = document.getElementById("pictOptions").value; 
+    // Generate PICT output file
+    var command = 'cmd /K "' + programPath + ' ' + modelFile + ' > ' + testCaseOutPut + ' ' + pictOptions + '"';    
+    var WshShell = new ActiveXObject("WScript.Shell");
+    var oExec = WshShell.Exec(command);        
+    oExec = null;
+    WshShell = null;
+    var timeout = document.getElementById("timeout").value;
+    timeout = timeout * 1000;
+    setTimeout('readTestCaseOutFile()', timeout);
+    document.getElementById("testCaseGrid").innerHTML = '<font face="verdana" size="1" style="BACKGROUND-COLOR: yellow">Please wait while creating test case file...</font>';
+}
+
+function writeFile(fileName, text) {
+    var fso = new ActiveXObject("Scripting.FileSystemObject");
+    var fh = fso.CreateTextFile(fileName, true);
+    fh.WriteLine(text);
+    fh.Close();
+}
+
+function XLExport() {
+    var i;
+    var j;
+    var mycell;
+    var tableID = "iList";
+    var objXL = new ActiveXObject("Excel.Application");
+    var objWB = objXL.Workbooks.Add();
+    var objWS = objWB.ActiveSheet;
+    for (i = 0; i < document.getElementById(tableID).rows.length; i++) {
+        for (j = 0; j < document.getElementById(tableID).rows(i).cells.length; j++) {
+            mycell = document.getElementById(tableID).rows(i).cells(j)
+            objWS.Cells(i + 1, j + 1).Value = mycell.innerText;
+        }
+    }
+    objWS.Rows(1).Font.Bold = true;
+    objWS.Range("A1", "Z1").EntireColumn.AutoFit();
+    objXL.Visible = true;
+}
+</script>
+</body>
+</html>

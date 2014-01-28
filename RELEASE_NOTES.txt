@@ -1,0 +1,17 @@
+*** Release Notes ***
+
+Version 0.2
+
+New features:
++ New input field for PICT options
++ New input field for output file timeout time
+
+Version 0.1
+
+First public version
+
+Features:
++ GUI wrapper for PICT.exe
++ Syntax highlight for Model file content
++ Test Cases output file content visable in GUI 
++ Export to Excel

@@ -1,0 +1,59 @@
+html {
+  cursor: text;
+}
+
+.editbox {
+  margin: .4em;
+  padding: 0;
+  font-family: monospace;
+  font-size: 9pt;
+  color: black;
+}
+
+.editbox p {
+  margin: 0;
+}
+
+span.pict-keyword {
+  color: blue;
+}
+
+span.pict-var {
+  color: red;
+}
+
+span.pict-comment {
+  color: green;
+}
+
+span.pict-literal {
+  color: red;
+}
+
+span.pict-operator {
+  color: blue;
+}
+
+span.pict-word {
+  color: black;
+}
+
+span.pict-quoted-word {
+  color: #FF66FF;
+}
+
+span.pict-function {
+  color: #008000;
+}
+
+span.pict-type {
+  color: black;
+}
+
+span.pict-separator {
+  color: #666666;
+}
+
+span.pict-number {
+  color: purple;
+}
