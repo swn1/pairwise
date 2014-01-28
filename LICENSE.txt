@@ -1,5 +1,24 @@
 *** PairWise Test Case Tool License ***
 
+ Copyright (c) 2014 Stephen W. Nuchia
+
+forked from the version found via
+	http://abouttesting.blogspot.se/2011/03/
+	pairwise-test-case-design-part-four.html
+as of January 28th, 2014.  This derived work remains
+subject to the original authors' license terms.
+
+It is my intent to license my changes liberaly, while complying
+with the letter and intent of the original licenses.
+
+A record of my changes, from the original package as downloaded,
+can be seen at http://github.com/swn1/pairwise.
+
+Stephen W. Nuchia swn1@alumni.rice.edu swn1.com 28 January 2014
+
+------
+
+
  Copyright (c) 2011 Stefan Thelenius
 
  This software is provided 'as-is', without any express or implied
